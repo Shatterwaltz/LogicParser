@@ -4,61 +4,73 @@
  * and open the template in the editor.
  */
 package logic.parser;
-
+import java.util.ArrayList;
 /**
  * Changes string into logical expression probably
  * @author shatterwaltz
  */
 public class Parser {
-    private String input;
-    int pos=0;
-    char cur;
-    
+    private Statement wff;
+    static ArrayList<Variable> varlist = new ArrayList(0);
     public Parser(String data){
-        input=data;
-        cur=input.charAt(pos);
-        System.out.println(data);
+        wff=parse(data);
     }
-    public Statement parse(){
+    
+    public Statement getWff(){return wff;}
+    private Statement parse(String input){
+    int pos=0;
+    int parencount=0;
+    char cur;
+    cur=input.charAt(pos);
         do{
         if(cur=='('){
-            int start=pos;
-            //probably have to decrement pos because I increment it to do something with parens
-            //just trust me it maybe works
-            pos--;
-            String temp1=parenParser(input);
-            //System.out.println(temp1);
+            String temp1=parenParser(input, pos);
             if(pos<input.length()){
+                pos++;
+                do{
+                    cur=input.charAt(pos);
+                    if(cur=='(')
+                        parencount++;
+                    else if(cur==')')
+                        parencount--;
+                    pos++;
+                    
+                }while(parencount>0);
+                pos++;
                 cur=input.charAt(pos);
                 char operator = cur;
-                String temp2 = parenParser(input);
-                //System.out.println(temp2);
-                System.out.println("op="+operator);
+                String temp2 = parenParser(input, pos);
+                System.out.println(temp1+","+temp2);
                 if(operator=='&'){
-                    System.out.println("anded it!");
-                    return new And(new Parser(temp1).parse(), new Parser(temp2).parse());
+                    return new And(parse(temp1), parse(temp2));
                 }
                 else if(operator=='/'){
-                    return new Or(new Parser(temp1).parse(), new Parser(temp2).parse());
+                    return new Or(parse(temp1), parse(temp2));
                 }
                 else if(operator=='>'){
-                    return new Implies(new Parser(temp1).parse(), new Parser(temp2).parse());
+                    return new Implies(parse(temp1), parse(temp2));
                 }
             }
             
         }
         if(cur=='!'){
-            return new Not(new Parser(parenParser(input)).parse());
+            return new Not(parse(parenParser(input, pos)));
         }
         else{
-            return new Variable();
+            //Check if variable already exists in varlist. If not, add to list.
+            //boolean varExists=false;
+            Variable v=new Variable(cur);
+            
+            return v;
         }
         }while(pos<input.length());
     }
+        
     //Parses through substrings encased in () or whatever
     //Looks like it can handle things like ((~~~)~~) too which is cool
-    private String parenParser(String input){
+    private String parenParser(String input, int pos){
         int parenCount=0;
+        char cur=input.charAt(pos);
         String temp="";
             pos++;
             do{
@@ -80,5 +92,5 @@ public class Parser {
             
         return temp;
     }
-    
+    public ArrayList<Variable> getVarList(){return varlist;}
 }

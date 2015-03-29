@@ -5,6 +5,7 @@
  */
 package logic.parser;
 import java.util.Scanner;
+import java.util.ArrayList;
 /**
  *
  * @author shatterwaltz
@@ -19,6 +20,8 @@ public class LogicParser {
         System.out.println("& - and\n/ - or\n! - not\n> - implies\nInput must be fully disambiguated with parentheses.\nUse only one letter for variables.\n*******************\nEnter well formed formula:\n");
         Scanner s = new Scanner(System.in);
         Parser p = new Parser(s.nextLine());
-        System.out.println("I interpreted: " + p.parse().toString());
+        System.out.println("I interpreted: " + p.getWff());
+        for(int i=0;i<p.getVarList().size();i++)
+            System.out.println(p.getVarList().get(i));
     }
 }
