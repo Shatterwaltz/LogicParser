@@ -4,81 +4,75 @@
  * and open the template in the editor.
  */
 package logic.parser;
-
+import java.util.ArrayList;
 /**
  * Changes string into logical expression probably
  * @author shatterwaltz
  */
 public class Parser {
-    private String input;
-    int pos=0;
-    char cur;
-    
+    private Statement wff;
+    int position=0;
+    static ArrayList<Variable> varlist = new ArrayList(0);
     public Parser(String data){
-        input=data;
-        cur=input.charAt(pos);
-        System.out.println(data);
-    }
-    public Statement parse(){
-        do{
-        if(cur=='('){
-            int start=pos;
-            //probably have to decrement pos because I increment it to do something with parens
-            //just trust me it maybe works
-            pos--;
-            String temp1=parenParser(input);
-            //System.out.println(temp1);
-            if(pos<input.length()){
-                cur=input.charAt(pos);
-                char operator = cur;
-                String temp2 = parenParser(input);
-                //System.out.println(temp2);
-                System.out.println("op="+operator);
-                if(operator=='&'){
-                    System.out.println("anded it!");
-                    return new And(new Parser(temp1).parse(), new Parser(temp2).parse());
-                }
-                else if(operator=='/'){
-                    return new Or(new Parser(temp1).parse(), new Parser(temp2).parse());
-                }
-                else if(operator=='>'){
-                    return new Implies(new Parser(temp1).parse(), new Parser(temp2).parse());
-                }
-            }
-            
-        }
-        if(cur=='!'){
-            return new Not(new Parser(parenParser(input)).parse());
-        }
-        else{
-            return new Variable();
-        }
-        }while(pos<input.length());
-    }
-    //Parses through substrings encased in () or whatever
-    //Looks like it can handle things like ((~~~)~~) too which is cool
-    private String parenParser(String input){
-        int parenCount=0;
-        String temp="";
-            pos++;
-            do{
-                cur=input.charAt(pos);
-                if(cur=='('){
-                    parenCount++;
-                    if(parenCount!=1)
-                        temp+=cur;
-                }
-                else if(cur==')'){
-                    parenCount--;
-                    if(parenCount!=0)
-                        temp+=cur;
-                }
-                else
-                    temp+=cur;
-                pos++;
-            }while(parenCount>0);
-            
-        return temp;
+       wff=parse(data);
     }
     
+    public Statement getWff(){return wff;}
+    
+    private Statement parse(String input){
+        position = 0;
+        char cur;
+        cur=input.charAt(position);
+        if(cur=='('){
+            position++;
+            String temp1=parenParser(input.substring(position));
+            if(position>=input.length()){
+                return parse(temp1);
+            }
+            else{
+                char operator = input.charAt(position);
+                position+=2;
+                String temp2=parenParser(input.substring(position));
+                switch(operator){
+                    case '&':
+                        return new And(parse(temp1), parse(temp2));
+                    case '/':
+                        return new Or(parse(temp1), parse(temp2));
+                    case '>':
+                        return new Or(new Not(parse(temp1)), parse(temp2));
+                }
+                        
+                        
+            }
+        }else if(cur=='!'){
+            position+=2;
+            return new Not(parse(parenParser(input.substring(position))));
+        }else{
+            return new Variable(cur);
+        }
+        
+        
+        return null;
+    }
+    private String parenParser(String input){
+        int parencount=1;
+        //tracks parenparser's progress through the substring
+        int parenpos=0;
+        char cur;
+        do{
+            cur=input.charAt(parenpos);
+            if(cur=='(')
+                parencount++;
+            else if(cur==')')
+                parencount--;
+            
+            parenpos++;
+        }while(parencount>0);
+        //shifts the parser's position marker over by how much was processed by parenparser
+       
+       
+        position+=parenpos;
+        return input.substring(0, parenpos-1);
+    }
+    public ArrayList<Variable> getVarList(){return varlist;}
 }

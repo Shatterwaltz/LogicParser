@@ -13,7 +13,8 @@ package logic.parser;
 public class Variable implements Statement{
     private boolean value=false;
     private String name="";
-    public Variable(){
+    public Variable(char name){
+        this.name+=name;
     }
     public void switchVal(){
         if(value)
@@ -25,9 +26,6 @@ public class Variable implements Statement{
     
     public boolean evaluate(){return value;}
     public String toString(){
-        if(value)
-            return "true";
-        else
-            return "false";
+        return name;
     }
 }
