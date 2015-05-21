@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package logic.parser;
+package logicparser;
 import java.util.ArrayList;
 /**
  * Changes string into logical expression probably
@@ -11,8 +11,8 @@ import java.util.ArrayList;
  */
 public class Parser {
     private Statement wff;
-    int position=0;
-    static ArrayList<Variable> varlist = new ArrayList(0);
+    private int position=0;
+    private ArrayList<Variable> varlist = new ArrayList(0);
     public Parser(String data){
        wff=parse(data);
     }
@@ -48,7 +48,14 @@ public class Parser {
             position+=2;
             return new Not(parse(parenParser(input.substring(position))));
         }else{
-            return new Variable(cur);
+            boolean exists=false;
+            String name=""+cur;
+            for(int i=0;i<varlist.size();i++){
+                if(name.equals(varlist.get(i).getName()))
+                    return varlist.get(i);
+            }
+            varlist.add(new Variable(cur));
+            return varlist.get(varlist.size()-1);
         }
         
         

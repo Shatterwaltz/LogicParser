@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package logic.parser;
+package logicparser;
 
 /**
  * Evaluated in all combinations of false/true with other variables.
@@ -28,4 +28,5 @@ public class Variable implements Statement{
     public String toString(){
         return name;
     }
+    public String getName(){return name;}
 }

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package logic.parser;
+package logicparser;
 import java.util.Scanner;
 import java.util.ArrayList;
 /**
@@ -22,6 +22,8 @@ public class LogicParser {
         Scanner s = new Scanner(System.in);
         Parser p = new Parser(s.nextLine());
         System.out.println("I interpreted: " + p.getWff());
+        TruthGenerator t=new TruthGenerator(p);
+        System.out.println(t.getTable());
         
     }
 }
