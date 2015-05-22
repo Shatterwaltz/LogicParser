@@ -3,4 +3,3 @@
 
 ##TODO:
 1. Add quantifier support
-# LogicParser
